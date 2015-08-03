@@ -31,7 +31,7 @@ def evalSeverity(severity):
 #'/Events/clase2'
 #]
 event_classes = [
-'/Events/enertel'
+'/Events/NUEVOS'
 ]
 filestr = '' #String para leer fichero de datos
 #transformada de prueba
@@ -66,12 +66,12 @@ for ec in event_classes:
        conex.dmd.Events.manage_addOrganizer(ec)
 
 #for c, v in datosdict.items(): 
-#	org = dmd.Events.getOrganizer('/Events/enertel')
+#	org = dmd.Events.getOrganizer('/Events/NUEVOS')
 #	inst = org.createInstance('"' + c + '"')
 #	inst.message = datosdict.get(c)['message']
 
 for c, v in datosdict.items(): 
-	org = dmd.Events.getOrganizer('/Events/enertel')
+	org = dmd.Events.getOrganizer('/Events/NUEVOS')
 	inst = org.createInstance(c)
 	inst.eventClassKey = c
 	inst.message = datosdict.get(c)['message']
@@ -83,7 +83,7 @@ for c, v in datosdict.items():
 	
 	
 #for definition in definitions:
-#        org = dmd.Events.getOrganizer('/Events/enertel')
+#        org = dmd.Events.getOrganizer('/Events/NUEVOS')
 #        inst = org.createInstance('"' + datosdict.values[definition]['name'] + '"')
 #        inst.example = 'snmp trap ' + definition['name']
 #        inst.transform = definition['transform']
