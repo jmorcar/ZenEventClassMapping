@@ -61,25 +61,38 @@ try:
 				line_split = line.split(";" , 6)
 				trap_name = line_split[0]
 				oid = line_split[1]
-				print (line_split[2])
+				#print (line_split[2])
 				logonly = evalLogonly(line_split[2])
 				severidad = evalSeverity(line_split[4])
 				texto_trap = line_split[5]
 				mytransform = """ 
-						evt.serverity = %s
-						evt.summary = %s
-						""" % (severidad , texto_trap)
+evt.severity = %s
+evt.summary = '%s'
+""" % (severidad , texto_trap)
 				if logonly:
 					mytransform += """
 					
-							evt._action = "history"
-							"""
+evt._action = "history"
+"""
 				
-				print ("Creando instancia -> %s" % trap_name)
-				print (mytransform)
-				inst = conex.find(trap_name)
-				#inst.transform = mytransform
-				print(inst)
+				print ("Editar instancia -> %s" % trap_name)
+				#print (mytransform)
+				org = dmd.Events.getOrganizer(event_classes)
+				for i in org.find(trap_name):
+						if i.eventClassKey == trap_name:
+							inst = i
+							inst.transform = mytransform
+							for j in inst.sameKey():
+								if inst.eventClassKey == j.eventClassKey:
+									print("duplicado: %s" % j)
+							
+				
+				
+				
+				
+				#inst = org.find(trap_name)
+				
+				#print(inst)
 				
 				
 				
@@ -90,12 +103,6 @@ finally:
         datos.close()	 
 	 
 	 
-	 
-	 
-	 
-	 
-	 
 
 
-
-#commit()
+commit()
