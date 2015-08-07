@@ -7,11 +7,7 @@ Script to import new SNMP Objects/Traps from a MIB file to ZenOSS as Nodes/Event
 
 # First of All to use these Scripts:
 
-<b>    Atratch to the specific container.
+<b>    Attach to the zenhub container.
     For DMD/Zope conections: </b>
     
-    # serviced service attach Zope
-
-<b> For Mariadb connections (To Add Mibs): </b>
-    
-    # serviced service attach mariadb
+    # serviced service attach zenhub
