@@ -1,5 +1,5 @@
 # ZenEventClassMapping
-Script to import new SNMP Objects/Traps from a MIB file to ZenOSS as Nodes/EventClassKey
+Tool Scripts to import/manage multiple SNMP Object-type/Trap-type on ZenOSS from the command line.
 
 # Tested versions:
 
