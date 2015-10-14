@@ -11,3 +11,7 @@ Tool Scripts to import/manage multiple SNMP Object-type/Trap-type on ZenOSS from
     For DMD/Zope conections: </b>
     
     # serviced service attach zenhub
+
+<b>    Upload the scripts to the zenhub container via scp command. For example:
+	# scp user@<IPhostServer>:/path/to/EditEventClassFromCsv.dmd /path/to/container/folder
+
