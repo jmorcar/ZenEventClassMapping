@@ -17,7 +17,7 @@
 
 [Note]
 
-	* Category : You can type "LOGONLY" category to send this Trap directly to History Zenoss Event console. 
+	* Category: You can type "LOGONLY" category to send this Trap directly to History Zenoss Event console. 
 	Any another Category name only adds this Trap to Status Event console.
 	* N/A: For future implementations. This field is not supported yet.
 	* Severity: You can type the severity name what you want in ZenOSS. The Severity is inserted as a new pyhton Transform of this EventClassMapping.
