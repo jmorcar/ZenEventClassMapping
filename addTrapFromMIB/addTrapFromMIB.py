@@ -2,6 +2,7 @@
 
 
 import json
+import time
 import Globals, sys, ast, yaml, os, tempfile
 from transaction import commit
 from Products.ZenUtils.ZenScriptBase import ZenScriptBase
@@ -21,7 +22,7 @@ cabecera = sys.argv[2].upper()
 
 filestr = '' #String para leer fichero de datos
 
-definitions = [] 	#Array para importar a ZENOSS
+definitions = []        #Array para importar a ZENOSS
 ###########################################
 
 #EXTRAER LAS TRAPS DEL FICHERO DE MIB
@@ -33,56 +34,67 @@ os.unlink(errfile[1])
 code = open(outfile[1],"r").read()
 os.unlink(outfile[1])
 try:
-	exec(code)
+        exec(code)
 except Exception, e:
-	print >> sys.stderr, "%s - ha fallado la carga de la mib, %s" % (file, errmsgs)
-	sys.exit(1)
+        print >> sys.stderr, "%s - ha fallado la carga de la mib, %s" % (file, errmsgs)
+        sys.exit(1)
 
 
-	
+
 try:
-	traps = MIB['notifications']
-	
-except NameError:
-	print >> sys.stderr, "%s was too badly formed to have output\n%s" % (file, errmsgs)
-	sys.exit(1)
+        traps = MIB['notifications']
+
+except:
+        print >> sys.stderr, "***WARNING:%s this MIB does not contain NODE objects...skiping\n%s" % (file, errmsgs)
+        sys.exit(1)
 #print "traps: %s" % traps
 
 
 
 for n , v in traps.items():
-	nombre_trap_nuevo = cabecera + n
-	traps[nombre_trap_nuevo] = traps.pop(n)
-	print (nombre_trap_nuevo)
-	varbinds = traps.get(nombre_trap_nuevo)['objects']
-	for o , b in varbinds.items():
-		nombre_varbinds_nuevo = cabecera + o
-		varbinds[nombre_varbinds_nuevo] = varbinds.pop(o)
-	
+        nombre_trap_nuevo = cabecera + n
+        traps[nombre_trap_nuevo] = traps.pop(n)
+        print (nombre_trap_nuevo)
+        varbinds = traps.get(nombre_trap_nuevo)['objects']
+        for o , b in varbinds.items():
+                nombre_varbinds_nuevo = cabecera + o
+                varbinds[nombre_varbinds_nuevo] = varbinds.pop(o)
 
 
 
-	
+
+
 try:
-	nodos = MIB['nodes']
-	
-except NameError:
-	print >> sys.stderr, "%s was too badly formed to have output\n%s" % (file, errmsgs)
-	sys.exit(1)
+        nodos = MIB['nodes']
+        for n , v in nodos.items():
+                nombre_nodo_nuevo = cabecera + n
+                nodos[nombre_nodo_nuevo] = nodos.pop(n)
+                print ("node: %s" % nombre_nodo_nuevo)
+
+
+except:
+        print >> sys.stderr, "***WARNING:%s this MIB has not any TRAP objects...skiping\n%s" % (file, errmsgs)
+        pass
 #print "traps: %s" % traps
 
+try:
+    Namemib = MIB['moduleName']
+except:
+    print >> sys.stderr, "***WARNING:%s this MIB has not any MIBname..skiping\n%s" % (file, errmsgs)
+    pass
+
+exportfile="/tmp/MIB_MODIFICADA.MIB"
+mibname="MIB_MODIFICADA.MIB"
+tstamp = str(int(time.time()))
+
+if tstamp:
+  exportfile="/tmp/MIB_MODIFICADA.MIB." + tstamp
+  mibname="MIB_MODIFICADA.MIB." + tstamp
+if Namemib:
+  mibname = Namemib + ".MIB"
+  exportfile="/tmp/" + mibname
 
 
-for n , v in nodos.items():
-	nombre_nodo_nuevo = cabecera + n
-	nodos[nombre_nodo_nuevo] = nodos.pop(n)
-	print (nombre_nodo_nuevo)
-	
-	
-	
-	
-	
-exportfile="/tmp/MIB_MODIFICADA.MIB"	
 cabecera_file = """
 # python version 1.0                                            DO NOT EDIT
 #
@@ -95,34 +107,45 @@ FILENAME = "%s"
 MIB = """ % file
 
 if os.path.isfile(exportfile):
-        os.remove(exportfile)	
+        os.remove(exportfile)
 with open(exportfile, 'a') as output:
-	output.write(cabecera_file)
-	json.dump(MIB, output, indent=2)
-	output.close()
-	# Import MIB command
-	print ("Lanzando comando de carga de MIB: zenmib...")
-	print ("zenmib run -v10 --evalSavedPython='%s'" %  exportfile)
-	os.system("zenmib run -v10 --evalSavedPython='%s'" %  exportfile)
+        output.write(cabecera_file)
+        json.dump(MIB, output, indent=2)
+        output.close()
+        # Import MIB command
+        print ("Lanzando comando de carga de MIB: zenmib...")
+        print ("zenmib run -v10 --evalSavedPython='%s'" %  exportfile)
+        os.system("zenmib run -v10 --evalSavedPython='%s'" %  exportfile)
+        #FIXME-SOLUTION TO CREATE A TEMPORARY SCRIPT TO IMPORT MIB FILE.
+        #pathrepo = "/opt/svn_working/Zenoss/Inventario/Mibs_cargadas"
+        #print ("Guardando fichero '%s' en el inventario de MIBs cargadas..." %  exportfile)
+        #print "scp '%s' root@172.16.9.3:'%s'" %  (exportfile, pathrepo)
+        #os.system("scp '%s' root@172.16.9.3:'%s'" % (exportfile, pathrepo) )
+        #FIXME-SOLUTION TO CONTINUE CREATE A TEMPORARY SCRIPT TO IMPORT MIB FILE.
+        #command = 'svn import -m "MIB imported from script"' + " " + pathrepo + "/" + mibname + " " + 'file:///physical/path/to/svn/repository/' + mibname
+#########FIXME-SOLUTION TO CONTINUE CREATE A TEMPORARY SCRIPT TO IMPORT MIB FILE.
+#Temporary SVN Script command
+#scriptshtxt = """
+#!/usr/bin/sh
+#
+#%s
+#
+#""" % command
+# ADDING TIME STAMP
+#exportfile2="/tmp/scriptsh.sh." + tstamp
 
+##########FIXME-When you want remove the scripts of previous executions. 
+##With timestamp this is a deprecated solution. And accessing via attach container it is not necessary because the container is temporal.
+##if os.path.isfile(exportfile2):
+##        os.remove(exportfile2)
+#
+#with open(exportfile2, 'w') as output:
+#        output.write(scriptshtxt)
+#        output.close()
 
+#
+#print "Uploading to the SVN Repository:'%s':command:'%s'" %  (exportfile, command)
+#SSH COMMAND TO UPLOAD FILE TO 1.1.1.1 SERVER - FIXME WITH THE IPADDRESS OF YOUR SERVER
+#os.system('ssh -T root@1.1.1.1 <' + exportfile2)
 
-
-
-	
-	
-
-	   
-
-
-	
-	
-	
-
-
-
-
-
-
-
-
+sys.exit(0)
