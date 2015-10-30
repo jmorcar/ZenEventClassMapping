@@ -27,7 +27,7 @@ definitions = [] 	#Array para importar a ZENOSS
 #EXTRAER LAS TRAPS DEL FICHERO DE MIB
 outfile = tempfile.mkstemp(prefix="traps-out")
 errfile = tempfile.mkstemp(prefix="traps-err")
-os.system("smidump --keep-going -f python %s > %s 2> %s " %  (file, outfile[1], errfile[1]))
+os.system("smidump -c /etc/smi.conf --keep-going -f python %s > %s 2> %s " %  (file, outfile[1], errfile[1]))
 errmsgs = open(errfile[1], "r").read()
 os.unlink(errfile[1])
 code = open(outfile[1],"r").read()
